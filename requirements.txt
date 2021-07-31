@@ -1,0 +1,2 @@
+immutabledict==2.1.0
+PyYAML==5.4.1
