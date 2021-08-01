@@ -1,11 +1,12 @@
 import argparse
+from collections import defaultdict
 import decimal
-from typing import Dict, List, Set, Tuple
+from typing import List, Set
 
 import yaml
 
 import converter
-from models import portfolio_model
+from models import asset_model, portfolio_model
 from models import symbol_model
 
 
@@ -46,8 +47,28 @@ def main():
             rates[(cv.from_symbol, cv.to_symbol)] = decimal.Decimal(rate)
 
     # Output each portfolio report.
+    all_portfolio_totals = defaultdict(decimal.Decimal)
     for portfolio in portfolios:
-        portfolio.report(rates=rates)
+
+        converted_assets: List[asset_model.Asset] = portfolio.convert(rates)
+        totals: List[asset_model.Asset] = portfolio.calculate_totals(rates)
+
+        print(f'\n========== {portfolio.name} ==========')
+        print('[Totals]')
+        for asset in totals:
+            print(f'{asset.symbol}: {asset.quantity}')
+            all_portfolio_totals[asset.symbol] += asset.quantity
+        print()
+        print('[Breakdowns]')
+        for original, converted in zip(portfolio.assets, converted_assets):
+            print(f'\t{original.symbol}: {original.quantity} => '
+                  f'{converted.symbol}: {converted.quantity}')
+        print()
+
+    # Output the totals of all portfolio totals.
+    print('\n========== Totals of all portfolios ==========')
+    for symbol, quantity in all_portfolio_totals.items():
+        print(f'{symbol}: {quantity}')
 
 
 if __name__ == '__main__':

@@ -39,26 +39,26 @@ class Portfolio:
                                      to_symbol=asset.target_symbol))
         return required_conversions
 
-    def report(self, rates: RATES_TYPE_ALIAS) -> None:
-        """Prints the summary to stdout."""
-        # Convert all assets
+    def convert(self, rates: RATES_TYPE_ALIAS) -> List[asset_model.Asset]:
+        """Converts all assets to quote in their target symbols."""
         converted: List[asset_model.Asset] = []
         for asset in self.assets:
             rate = rates[(asset.symbol, asset.target_symbol)]
             converted.append(asset_model.Asset(
                 symbol=asset.target_symbol,
                 quantity=decimal.Decimal(asset.quantity) * rate))
+        return converted
 
-        # Totals
-        total_assets: Dict[symbol_model.Symbol, decimal.Decimal] = defaultdict(decimal.Decimal)
-        for converted_asset in converted:
-            total_assets[converted_asset.symbol] += converted_asset.quantity
+    def calculate_totals(self,
+                         rates: RATES_TYPE_ALIAS) -> List[asset_model.Asset]:
+        """Sums up the same assets after converting."""
+        converted = self.convert(rates)
 
-        print(f'\n========== {self.name} ==========')
-        for symbol, quantity in total_assets.items():
-            print(f'{symbol}: {quantity}')
-        print()
-        for orig_asset, cvrt_asset in zip(self.assets, converted):
-            print(f'\t{orig_asset.symbol}: {orig_asset.quantity} => '
-                  f'{cvrt_asset.symbol}: {cvrt_asset.quantity}')
-        print()
+        per_symbol_totals = defaultdict(decimal.Decimal)
+        for asset in converted:
+            per_symbol_totals[asset.symbol] += asset.quantity
+
+        return [
+            asset_model.Asset(symbol=symbol, quantity=quantity)
+            for symbol, quantity in per_symbol_totals.items()
+        ]
