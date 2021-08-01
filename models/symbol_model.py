@@ -50,6 +50,7 @@ _ALL_SYMBOLS = (
     Symbol(symbol_type=SymbolType.CRYPTO, name='LINK'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='MAPS'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='MER'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='NEXO'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='OXY'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='RAY'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='REEF'),

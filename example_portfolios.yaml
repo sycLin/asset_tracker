@@ -3,29 +3,19 @@ Portfolios:
 
   - name: Firstrade
     assets:
-      - symbol:
-          type: US_STOCK
-          name: GOOG
+      - symbol: US_STOCK.GOOG
         quantity: 5
-      - symbol:
-          type: US_STOCK
-          name: SE
+      - symbol: US_STOCK.SE
         quantity: 2
 
   - name: Taiwan banks
     assets:
-      - symbol:
-          type: FIAT
-          name: TWD
+      - symbol: FIAT.TWD
         quantity: 12486
 
   - name: FTX Exchange
     assets:
-      - symbol:
-          type: CRYPTO
-          name: ETH
+      - symbol: CRYPTO.ETH
         quantity: "0.4"
-      - symbol:
-          type: CRYPTO
-          name: FTT
+      - symbol: CRYPTO.FTT
         quantity: 150
