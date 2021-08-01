@@ -12,15 +12,8 @@ class Asset:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]):
-        symbol_data = data['symbol']
-        if 'full_name' in symbol_data:
-            symbol_object = symbol_model.get_symbol_from_full_name(
-                symbol_data['full_name'])
-        else:
-            symbol_type = symbol_model.SymbolType[symbol_data['type']]
-            symbol_object = symbol_model.get_symbol_from_type_and_name(
-                symbol_type, symbol_data['name'])
-        return cls(symbol=symbol_object,
+        symbol = symbol_model.get_symbol_from_full_name(data['symbol'])
+        return cls(symbol=symbol,
                    quantity=decimal.Decimal(data['quantity']))
 
     def __init__(self,

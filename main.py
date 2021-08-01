@@ -27,6 +27,8 @@ def main():
         help='Path to YAML file that stores portfolio data.')
     args = parser.parse_args()
 
+    decimal.getcontext().prec = 6
+
     # Load portfolios and get conversions.
     portfolios = _load_portfolios_from_yaml(file_path=args.portfolio_yaml)
     required_conversions: Set[converter.Conversion] = set()

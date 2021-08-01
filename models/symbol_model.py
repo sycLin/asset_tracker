@@ -38,13 +38,38 @@ class Symbol:
 
 
 _ALL_SYMBOLS = (
+    Symbol(symbol_type=SymbolType.CRYPTO, name='BNB'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='BTC'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='COIN'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='DOGE'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='ETH'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='FTT'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='GRT'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='KIN'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='LINK'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='MAPS'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='MER'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='OXY'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='RAY'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='REEF'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='SOL'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='SRM'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='SUSHI'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='SXP'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='TRX'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='UNI'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='ZRX'),
+
     Symbol(symbol_type=SymbolType.FIAT, name='TWD'),
     Symbol(symbol_type=SymbolType.FIAT, name='USD'),
+
+    Symbol(symbol_type=SymbolType.US_STOCK, name='AAPL'),
+    Symbol(symbol_type=SymbolType.US_STOCK, name='DIS'),
     Symbol(symbol_type=SymbolType.US_STOCK, name='GOOG'),
+    Symbol(symbol_type=SymbolType.US_STOCK, name='NIO'),
     Symbol(symbol_type=SymbolType.US_STOCK, name='SE'),
+    Symbol(symbol_type=SymbolType.US_STOCK, name='TSLA'),
+    Symbol(symbol_type=SymbolType.US_STOCK, name='TSM'),
 )
 
 _FULL_NAME_TO_SYMBOL = immutabledict.immutabledict({
