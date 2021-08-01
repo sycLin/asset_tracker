@@ -9,6 +9,7 @@ from models import symbol_model
 
 _FTX_API_TIMEOUT_SECONDS = 3.0
 _BINANCE_API_TIMEOUT_SECONDS = 3.0
+_HUOBI_API_TIMEOUT_SECONDS = 3.0
 
 
 class Conversion:
@@ -37,15 +38,24 @@ class Conversion:
         if self.from_symbol == self.to_symbol:
             return decimal.Decimal("1")
         if self.from_symbol.symbol_type is symbol_model.SymbolType.CRYPTO:
-            try:
-                return _get_ftx_conversion_rate(
-                    from_symbol=self.from_symbol,
-                    to_symbol=self.to_symbol)
-            except:
-                return _get_binance_conversion_rate(
-                    from_symbol=self.from_symbol,
-                    to_symbol=self.to_symbol)
+            return _resolve_crypto_conversion_rate(from_symbol=self.from_symbol,
+                                            to_symbol=self.to_symbol)
         raise NotImplementedError()
+
+
+def _resolve_crypto_conversion_rate(
+    from_symbol: symbol_model.Symbol,
+    to_symbol: symbol_model.Symbol) -> decimal.Decimal:
+    resolve_funcs = (
+        _get_ftx_conversion_rate,
+        _get_binance_conversion_rate,
+        _get_huobiglobal_conversion_rate)
+    for func in resolve_funcs:
+        try:
+            return func(from_symbol=from_symbol, to_symbol=to_symbol)
+        except:
+            pass
+    raise RuntimeError('Resolving crypto conversion rate failed.')
 
 
 def _get_ftx_conversion_rate(
@@ -81,4 +91,25 @@ def _get_binance_conversion_rate(
     if response.status_code != http.HTTPStatus.OK:
         raise RuntimeError(f'API failed, status = {response.status_code}')
     last_price = response.json()['price']
+    return decimal.Decimal(last_price)
+
+def _get_huobiglobal_conversion_rate(
+    from_symbol: symbol_model.Symbol,
+    to_symbol: symbol_model.Symbol) -> decimal.Decimal:
+
+    if to_symbol.name == 'USD':
+        to_symbol_name = 'USDT'
+    else:
+        to_symbol_name = to_symbol.name
+
+    huobi_symbol = (from_symbol.name + to_symbol_name).lower()
+    endpoint = ('https://api.huobi.pro/market/detail/merged'
+                f'?symbol={huobi_symbol}')
+    try:
+        response = requests.get(endpoint, timeout=_HUOBI_API_TIMEOUT_SECONDS)
+    except requests.exceptions.Timeout:
+        raise RuntimeError('HuobiGlobal API timed out.')
+    if response.status_code != http.HTTPStatus.OK:
+        raise RuntimeError(f'API failed, status = {response.status_code}')
+    last_price = response.json()['tick']['close']
     return decimal.Decimal(last_price)
