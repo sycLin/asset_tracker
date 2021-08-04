@@ -63,6 +63,7 @@ _ALL_SYMBOLS = (
     Symbol(symbol_type=SymbolType.CRYPTO, name='TRX'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='TWT'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='UNI'),
+    Symbol(symbol_type=SymbolType.CRYPTO, name='USDC'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='USDT'),
     Symbol(symbol_type=SymbolType.CRYPTO, name='ZRX'),
 
