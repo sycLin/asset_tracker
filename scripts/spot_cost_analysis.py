@@ -16,7 +16,7 @@ class SpotStats:
 
     asset_name: str
 
-    # The amount of target asset bough, and the USD(T) spent.
+    # The amount of target asset bought, and the USD(T) spent.
     bought: decimal.Decimal = _DECIMAL_ZERO
     spent: decimal.Decimal = _DECIMAL_ZERO
 
@@ -33,6 +33,7 @@ class SpotStats:
 
 def get_multiple_spot_stats(file_path: str,
                             asset_names: List[str]) -> Dict[str, SpotStats]:
+    """Parses CSV file to get SpotStats for each asset."""
     ret = {name: SpotStats(name) for name in asset_names}
     with open(file_path, 'r') as f:
         for line in f:
@@ -86,7 +87,6 @@ def main():
 
     decimal.getcontext().prec = 8
 
-    # Read trades and filter and populate SpotStats instances.
     asset_name_to_stats = get_multiple_spot_stats(args.file, args.assets)
 
     for asset_name, stats in asset_name_to_stats.items():
