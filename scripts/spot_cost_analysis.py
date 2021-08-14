@@ -23,6 +23,7 @@ class SpotStats:
     """Data class to store cost and earns of a target SPOT asset."""
 
     asset_name: str
+    num_transactions: int = 0
 
     # The amount of target asset bought, and the USD(T) spent.
     bought: decimal.Decimal = _DECIMAL_ZERO
@@ -69,9 +70,11 @@ def get_multiple_spot_stats(file_path: str,
             if side == '"buy"':
                 ret[base].bought += size
                 ret[base].spent += (size * price)
+                ret[base].num_transactions += 1
             elif side == '"sell"':
                 ret[base].sold += size
                 ret[base].received += (size * price)
+                ret[base].num_transactions += 1
             else:
                 raise ValueError(f'Did not recognize side value: {side}')
     return ret
@@ -109,7 +112,7 @@ def main():
 
     total_pnl = _DECIMAL_ZERO
     for asset_name, stats in asset_name_to_stats.items():
-        print(f'===== {asset_name} ===== ')
+        print(f'===== {asset_name}: {stats.num_transactions} trades. ===== ')
         print(f'Spent {stats.spent}U for {stats.bought} {asset_name}. '
               f'({stats.get_average_buy_price()}U each.)')
         print(f'Sold {stats.sold} {asset_name} for {stats.received}U. '
