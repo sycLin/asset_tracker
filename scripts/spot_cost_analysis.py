@@ -2,12 +2,20 @@
 import argparse
 from dataclasses import dataclass
 import decimal
+import enum
 from typing import Dict, List, Tuple
 
 import requests
 
 
 _DECIMAL_ZERO = decimal.Decimal('0')
+
+
+class AnsiColorSequence(enum.Enum):
+    """ANSI escpae code for colors."""
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    END = '\033[0m'
 
 
 @dataclass
@@ -29,6 +37,16 @@ class SpotStats:
 
     def get_average_sell_price(self) -> decimal.Decimal:
         return self.received / self.sold if self.sold else _DECIMAL_ZERO
+
+
+def _colored_pnl(pnl_value: decimal.Decimal) -> str:
+    if pnl_value >= 0:
+        color = AnsiColorSequence.GREEN.value
+        pnl_str = f'+{pnl_value}'
+    else:
+        color = AnsiColorSequence.RED.value
+        pnl_str = str(pnl_value)
+    return f'{color}{pnl_str}{AnsiColorSequence.END.value}'
 
 
 def get_multiple_spot_stats(file_path: str,
@@ -89,6 +107,7 @@ def main():
 
     asset_name_to_stats = get_multiple_spot_stats(args.file, args.assets)
 
+    total_pnl = _DECIMAL_ZERO
     for asset_name, stats in asset_name_to_stats.items():
         print(f'===== {asset_name} ===== ')
         print(f'Spent {stats.spent}U for {stats.bought} {asset_name}. '
@@ -98,13 +117,15 @@ def main():
         if args.include_live_price:
             current_price = get_current_price_from_ftx(asset_name)
             print(f'Current price on FTX is: {current_price}')
-            # calculate the +/-
+            # Calculate the PnL if applicable.
             if stats.bought > stats.sold:
                 amount_left = stats.bought - stats.sold
                 total_value = amount_left * current_price + stats.received
-                prefix = '+' if total_value > stats.spent else '-'
-                print(f'({prefix}{abs(total_value - stats.spent)})')
+                pnl = total_value - stats.spent
+                print(f'({_colored_pnl(pnl)})')
+                total_pnl += pnl
         print()
+    print('Total PnL: ' + _colored_pnl(total_pnl))
 
 
 if __name__ == '__main__':
