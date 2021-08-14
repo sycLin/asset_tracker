@@ -59,7 +59,7 @@ def get_multiple_spot_stats(file_path: str,
     return ret
 
 
-def get_current_price_from_ftx(asset_name):
+def get_current_price_from_ftx(asset_name: str) -> decimal.Decimal:
     market_name = f'{asset_name}/USD'
     endpoint = f'https://ftx.com/api/markets/{market_name}'
     response = requests.get(endpoint)
