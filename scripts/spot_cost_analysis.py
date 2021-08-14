@@ -68,10 +68,10 @@ def get_spot_stats(asset_name: str, trade_lines: List[str]) -> SpotStats:
         side = tokens[3]
         size = decimal.Decimal(tokens[5].strip('"'))
         price = decimal.Decimal(tokens[6].strip('"'))
-        if tokens[3] == '"buy"':
+        if side == '"buy"':
             ret.bought += size
             ret.spent += (size * price)
-        elif tokens[3] == '"sell"':
+        elif side == '"sell"':
             ret.sold += size
             ret.received += (size * price)
         else:
