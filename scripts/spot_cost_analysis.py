@@ -69,7 +69,7 @@ def get_current_price_from_ftx(asset_name: str) -> decimal.Decimal:
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-a',
                         '--assets',
                         nargs='+',
