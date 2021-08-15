@@ -3,7 +3,7 @@ import argparse
 from dataclasses import dataclass
 import decimal
 import enum
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import requests
 
