@@ -19,6 +19,8 @@ class FtxClient:
 
     _BASE_URL = 'https://ftx.com/api'
     _DEFAULT_API_TIMEOUT_SECS = 5.0
+    _DEFAULT_API_ATTEMPTS = 3
+    _DEFAULT_API_RETRY_COOLDOWN_SECS = 0.1
 
     _USER_FILLS_RESPONSE_PAGE_SIZE = 20
 
@@ -59,6 +61,8 @@ class FtxClient:
                                              endpoint=endpoint,
                                              sign=True,
                                              params=params)
+            if response is None:
+                break
             fills = [fill
                      for fill in response.json()['result']
                      if fill['id'] not in id_seen]
@@ -76,13 +80,22 @@ class FtxClient:
                          endpoint: str,
                          timeout: Optional[float] = None,
                          sign: bool = False,
-                         **kwargs) -> requests.Response:
+                         attemps: int = _DEFAULT_API_ATTEMPTS,
+                         **kwargs) -> Optional[requests.Response]:
         if timeout is None:
             timeout = self._DEFAULT_API_TIMEOUT_SECS
         request = requests.Request(method=method, url=endpoint, **kwargs)
         if sign:
             request = self._sign_request(request)
-        return self._session.send(request.prepare(), timeout=timeout)
+        for _ in range(attemps):
+            try:
+                response = self._session.send(request.prepare(), timeout=timeout)
+                if response.json()['success']:
+                    return response
+            except requests.exceptions.Timeout:
+                continue
+            time.sleep(self._DEFAULT_API_RETRY_COOLDOWN_SECS)
+        return None
 
     def _sign_request(self, request: requests.Request) -> requests.Request:
         ts_millis = int(time.time() * 1000)
