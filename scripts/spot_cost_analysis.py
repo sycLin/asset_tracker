@@ -7,6 +7,8 @@ from typing import Dict, List
 
 import requests
 
+import ftx
+
 
 _DECIMAL_ZERO = decimal.Decimal('0')
 
@@ -80,15 +82,6 @@ def get_multiple_spot_stats(file_path: str,
     return ret
 
 
-def get_current_price_from_ftx(asset_name: str) -> decimal.Decimal:
-    market_name = f'{asset_name}/USD'
-    endpoint = f'https://ftx.com/api/markets/{market_name}'
-    response = requests.get(endpoint)
-    # TODO: Add error handling.
-    last_price = str(response.json()['result']['last'])
-    return decimal.Decimal(last_price)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-a',
@@ -110,6 +103,9 @@ def main():
 
     asset_name_to_stats = get_multiple_spot_stats(args.file, args.assets)
 
+    if args.include_live_price:
+        ftx_client = ftx.FtxClient()
+
     total_pnl = _DECIMAL_ZERO
     for asset_name, stats in asset_name_to_stats.items():
         print(f'===== {asset_name}: {stats.num_transactions} trades. ===== ')
@@ -118,7 +114,7 @@ def main():
         print(f'Sold {stats.sold} {asset_name} for {stats.received}U. '
               f'({stats.get_average_sell_price()}U each.)')
         if args.include_live_price:
-            current_price = get_current_price_from_ftx(asset_name)
+            current_price = ftx_client.get_last_price(f'{asset_name}/USD')
             print(f'Current price on FTX is: {current_price}')
             # Calculate the PnL if applicable.
             if stats.bought > stats.sold:
