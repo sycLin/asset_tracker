@@ -5,8 +5,6 @@ import decimal
 import enum
 from typing import Dict, List
 
-import requests
-
 import ftx
 
 
