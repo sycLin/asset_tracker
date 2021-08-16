@@ -77,36 +77,6 @@ def get_spot_stats(asset_name: str,
     return ret
 
 
-def get_multiple_spot_stats(file_path: str,
-                            asset_names: List[str]) -> Dict[str, SpotStats]:
-    """Parses CSV file to get SpotStats for each asset."""
-    ret = {name: SpotStats(name) for name in asset_names}
-    with open(file_path, 'r') as f:
-        for line in f:
-            tokens = line.strip().split(',')
-
-            # tokens[2] should be like "ETH/USD", "ETH/USDT", etc.
-            if '/' not in tokens[2]:
-                continue
-            base, quote = tokens[2].strip('"').split('/', 1)
-            if base not in asset_names or quote not in ('USD', 'USDT'):
-                continue
-            side = tokens[3]
-            size = decimal.Decimal(tokens[5].strip('"'))
-            price = decimal.Decimal(tokens[6].strip('"'))
-            if side == '"buy"':
-                ret[base].bought += size
-                ret[base].spent += (size * price)
-                ret[base].num_transactions += 1
-            elif side == '"sell"':
-                ret[base].sold += size
-                ret[base].received += (size * price)
-                ret[base].num_transactions += 1
-            else:
-                raise ValueError(f'Did not recognize side value: {side}')
-    return ret
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-a',
