@@ -125,7 +125,7 @@ def main():
                 amount_left = stats.bought - stats.sold
                 total_value = amount_left * current_price + stats.received
                 pnl = total_value - stats.spent
-                print(f'({_colored_pnl(pnl)})')
+                print(f'Total worth: {total_value}U ({_colored_pnl(pnl)})')
                 total_pnl += pnl
         print()
     print('Total PnL: ' + _colored_pnl(total_pnl))
