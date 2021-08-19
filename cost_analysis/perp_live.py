@@ -55,13 +55,9 @@ def get_perp_stats(asset_name: str,
                    ftx_client: ftx.FtxClient,
                    start_time: int,
                    end_time: int) -> PerpStats:
-    usd_fills = ftx_client.get_user_trades(market_name=f'{asset_name}-PERP',
+    all_fills = ftx_client.get_user_trades(market_name=f'{asset_name}-PERP',
                                            start_time=start_time,
                                            end_time=end_time)
-    usdt_fills = ftx_client.get_user_trades(market_name=f'{asset_name}-PERP',
-                                            start_time=start_time,
-                                            end_time=end_time)
-    all_fills = usd_fills + usdt_fills
     ret = PerpStats(asset_name=asset_name, num_transactions=len(all_fills))
     for fill in all_fills:
         side = fill['side']
