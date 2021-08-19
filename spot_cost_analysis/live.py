@@ -101,12 +101,17 @@ def main():
     parser.add_argument('--api_secret',
                         help='FTX API secret.',
                         required=True)
+    parser.add_argument('--subaccount_name',
+                        help='FTX subaccount.',
+                        required=False,
+                        default=None)
     args = parser.parse_args()
 
     decimal.getcontext().prec = 8
 
     ftx_client = ftx.FtxClient(api_key=args.api_key,
-                               api_secret=args.api_secret)
+                               api_secret=args.api_secret,
+                               subaccount_name=args.subaccount_name)
 
     asset_name_to_stats = {
         asset_name: get_spot_stats(asset_name,
