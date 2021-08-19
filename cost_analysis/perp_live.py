@@ -130,7 +130,7 @@ def main():
         current_price = ftx_client.get_last_price(f'{asset_name}/USD')
         print(f'Current price on FTX is: {current_price}')
         # Calculate the PnL if applicable.
-        if stats.bought > stats.sold:
+        if stats.bought >= stats.sold:
             amount_left = stats.bought - stats.sold
             total_value = amount_left * current_price + stats.received
             pnl = total_value - stats.spent
