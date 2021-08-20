@@ -1,11 +1,11 @@
 """Script to analyze PERP cost by sending live FTX API."""
 import argparse
-from dataclasses import dataclass
 import decimal
 import enum
 import time
 
 import ftx
+import stats_model
 
 
 _DEFAULT_START_TIMESTAMP: int = 1577836800
@@ -19,30 +19,10 @@ class AnsiColorSequence(enum.Enum):
     END = '\033[0m'
 
 
-@dataclass
-class PerpStats:
-    """Data class to store cost and earns of a target PERP asset."""
-
-    asset_name: str
-    num_transactions: int = 0
-
-    # The amount of target asset bought, and the USD(T) spent.
-    bought: decimal.Decimal = _DECIMAL_ZERO
-    spent: decimal.Decimal = _DECIMAL_ZERO
-
-    # The amount of target asset sold, and the USD(T) received.
-    sold: decimal.Decimal = _DECIMAL_ZERO
-    received: decimal.Decimal = _DECIMAL_ZERO
-
-    def get_average_buy_price(self) -> decimal.Decimal:
-        return self.spent / self.bought if self.bought else _DECIMAL_ZERO
-
-    def get_average_sell_price(self) -> decimal.Decimal:
-        return self.received / self.sold if self.sold else _DECIMAL_ZERO
-
-
 def _colored_pnl(pnl_value: decimal.Decimal) -> str:
-    if pnl_value >= 0:
+    if pnl_value == _DECIMAL_ZERO:
+        return str(pnl_value)
+    if pnl_value > 0:
         color = AnsiColorSequence.GREEN.value
         pnl_str = f'+{pnl_value}'
     else:
@@ -54,11 +34,14 @@ def _colored_pnl(pnl_value: decimal.Decimal) -> str:
 def get_perp_stats(asset_name: str,
                    ftx_client: ftx.FtxClient,
                    start_time: int,
-                   end_time: int) -> PerpStats:
+                   end_time: int) -> stats_model.CostAndEarnStats:
     all_fills = ftx_client.get_user_trades(market_name=f'{asset_name}-PERP',
                                            start_time=start_time,
                                            end_time=end_time)
-    ret = PerpStats(asset_name=asset_name, num_transactions=len(all_fills))
+    ret = stats_model.CostAndEarnStats(
+        base_asset_name=asset_name,
+        quote_asset_name='USD',
+        num_transactions=len(all_fills))
     for fill in all_fills:
         side = fill['side']
         size = decimal.Decimal(str(fill['size']))
@@ -116,7 +99,7 @@ def main():
                                    args.end_timestamp)
         for asset_name in args.assets}
 
-    total_pnl = _DECIMAL_ZERO
+    total_pnl = stats_model.Pnl()
     for asset_name, stats in asset_name_to_stats.items():
         print(f'===== {asset_name}: {stats.num_transactions} trades. ===== ')
         print(f'Spent {stats.spent}U for {stats.bought} {asset_name}. '
@@ -126,14 +109,14 @@ def main():
         current_price = ftx_client.get_last_price(f'{asset_name}/USD')
         print(f'Current price on FTX is: {current_price}')
         # Calculate the PnL if applicable.
-        if stats.bought >= stats.sold:
-            amount_left = stats.bought - stats.sold
-            total_value = amount_left * current_price + stats.received
-            pnl = total_value - stats.spent
-            print(f'Total worth: {total_value}U ({_colored_pnl(pnl)})')
-            total_pnl += pnl
+        pnl = stats.get_pnl(current_price)
+        print(f'Realized PnL: {_colored_pnl(pnl.realized)}')
+        print(f'Unrealized PnL: {_colored_pnl(pnl.unrealized)}')
+        total_pnl.realized += pnl.realized
+        total_pnl.unrealized += pnl.unrealized
         print()
-    print('Total PnL: ' + _colored_pnl(total_pnl))
+    print(f'Total Realized PnL: {_colored_pnl(total_pnl.realized)}')
+    print(f'Total Unrealized PnL: {_colored_pnl(total_pnl.unrealized)}')
 
 
 if __name__ == '__main__':
