@@ -11,6 +11,11 @@ class Pnl:
     realized: decimal.Decimal = _DECIMAL_ZERO
     unrealized: decimal.Decimal = _DECIMAL_ZERO
 
+    @property
+    def total(self) -> decimal.Decimal:
+        """The sum of realized and unrealized PnL."""
+        return self.realized + self.unrealized
+
 
 @dataclasses.dataclass
 class CostAndEarnStats:

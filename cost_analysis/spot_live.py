@@ -116,15 +116,16 @@ def main():
 
         pnl = stats.get_pnl(current_price)
         # Print format: "PnL: xyz (Realized: xyz, Unrealized: xyz)"
-        print(f'PnL: {_colored_pnl(pnl.realized + pnl.unrealized)} '
+        print(f'PnL: {_colored_pnl(pnl.total)} '
               f'(Realized: {_colored_pnl(pnl.realized)}, '
               f'Unrealized: {_colored_pnl(pnl.unrealized)})')
         total_pnl.realized += pnl.realized
         total_pnl.unrealized += pnl.unrealized
         print()
 
-    print(f'Total Realized PnL: {_colored_pnl(total_pnl.realized)}')
-    print(f'Total Unrealized PnL: {_colored_pnl(total_pnl.unrealized)}')
+    print(f'Total PnL: {_colored_pnl(total_pnl.total)} '
+          f'(Realized: {_colored_pnl(total_pnl.realized)}, '
+          f'Unrealized: {_colored_pnl(total_pnl.unrealized)})')
 
 
 if __name__ == '__main__':
