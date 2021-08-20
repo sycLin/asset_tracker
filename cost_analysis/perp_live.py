@@ -108,10 +108,12 @@ def main():
               f'({stats.get_average_sell_price()}U each.)')
         current_price = ftx_client.get_last_price(f'{asset_name}/USD')
         print(f'Current price on FTX is: {current_price}')
-        # Calculate the PnL if applicable.
+
         pnl = stats.get_pnl(current_price)
-        print(f'Realized PnL: {_colored_pnl(pnl.realized)}')
-        print(f'Unrealized PnL: {_colored_pnl(pnl.unrealized)}')
+        # Print format: "PnL: xyz (Realized: xyz, Unrealized: xyz)"
+        print(f'PnL: {_colored_pnl(pnl.realized + pnl.unrealized)} '
+              f'(Realized: {_colored_pnl(pnl.realized)}, '
+              f'Unrealized: {_colored_pnl(pnl.unrealized)})')
         total_pnl.realized += pnl.realized
         total_pnl.unrealized += pnl.unrealized
         print()
