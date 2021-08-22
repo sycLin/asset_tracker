@@ -4,4 +4,5 @@ idna==3.2
 immutabledict==2.1.0
 PyYAML==5.4.1
 requests==2.26.0
+selenium==3.141.0
 urllib3==1.26.6
