@@ -8,12 +8,10 @@ The script waits for the Sonar dashboard to load. We can override the default
 wait duration using command-line argument.
 """
 import argparse
-import dataclasses
 import json
 import logging
 import sys
-import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 from selenium import webdriver
 
