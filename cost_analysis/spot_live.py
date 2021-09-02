@@ -17,6 +17,11 @@ class AnsiColorSequence(enum.Enum):
     """ANSI escpae code for colors."""
     RED = '\033[31m'
     GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    CYAN = '\033[36m'
+    GRAY = '\033[90m'
+    BRIGHT_YELLOW = '\033[93m'
     END = '\033[0m'
 
 
@@ -30,6 +35,10 @@ def _colored_pnl(pnl_value: decimal.Decimal) -> str:
         color = AnsiColorSequence.RED.value
         pnl_str = str(pnl_value)
     return f'{color}{pnl_str}{AnsiColorSequence.END.value}'
+
+
+def _colored_text(text: str, color: AnsiColorSequence) -> str:
+    return f'{color.value}{text}{AnsiColorSequence.END.value}'
 
 
 def get_spot_stats(asset_name: str,
@@ -106,7 +115,10 @@ def main():
 
     total_pnl = stats_model.Pnl()
     for asset_name, stats in asset_name_to_stats.items():
-        print(f'===== {asset_name}: {stats.num_transactions} trades. ===== ')
+        print()
+        print(_colored_text(
+            f'===== {asset_name}: {stats.num_transactions} trades. ===== ',
+            AnsiColorSequence.YELLOW))
         print(f'Spent {stats.spent}U for {stats.bought} {asset_name}. '
               f'({stats.get_average_buy_price()}U each.)')
         print(f'Sold {stats.sold} {asset_name} for {stats.received}U. '
