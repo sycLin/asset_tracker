@@ -106,12 +106,14 @@ def main():
                                api_secret=args.api_secret,
                                subaccount_name=args.subaccount_name)
 
+    asset_names = set(args.assets)
+
     asset_name_to_stats = {
         asset_name: get_spot_stats(asset_name,
                                    ftx_client,
                                    args.start_timestamp,
                                    args.end_timestamp)
-        for asset_name in args.assets}
+        for asset_name in asset_names}
 
     total_pnl = stats_model.Pnl()
     for asset_name, stats in asset_name_to_stats.items():
@@ -119,6 +121,10 @@ def main():
         print(_colored_text(
             f'===== {asset_name}: {stats.num_transactions} trades. ===== ',
             AnsiColorSequence.YELLOW))
+
+        if stats.num_transactions == 0:
+            continue
+
         print(f'Spent {stats.spent}U for {stats.bought} {asset_name}. '
               f'({stats.get_average_buy_price()}U each.)')
         print(f'Sold {stats.sold} {asset_name} for {stats.received}U. '
